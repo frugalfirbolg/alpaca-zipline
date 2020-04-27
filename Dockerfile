@@ -15,7 +15,7 @@
 #
 #    docker exec -it zipline zipline run -f /projects/my_algo.py --start 2015-1-1 --end 2016-1-1 /projects/result.pickle
 #
-FROM python:3.5
+FROM python:3.6
 
 #
 # set up environment
@@ -48,8 +48,12 @@ RUN mkdir ${PROJECT_DIR} \
 
 WORKDIR /ta-lib
 
+RUN echo "deb-src http://deb.debian.org/debian buster-updates main" >> /etc/apt/sources.list \
+  && echo "deb-src http://deb.debian.org/debian buster main" >> /etc/apt/sources.list \
+  && apt-get -y install libhdf5-serial-dev
+
 RUN pip install 'numpy>=1.11.1,<2.0.0' \
-  && pip install 'scipy>=0.17.1,<1.0.0' \
+  && pip install 'scipy>=1.0.0' \
   && pip install 'pandas>=0.18.1,<1.0.0' \
   && ./configure --prefix=/usr \
   && make \
@@ -58,8 +62,8 @@ RUN pip install 'numpy>=1.11.1,<2.0.0' \
   && pip install matplotlib \
   && pip install jupyter
 
-RUN pip install git+https://github.com/alpacahq/zipline@98e860b55c9fc4a8a825fe6c0f558b0fb2866bf8
-RUN pip install alpaca-trade-api==0.10.0
+RUN pip install git+https://github.com/frugalfirbolg/zipline#fix_iex_data
+RUN pip install alpaca-trade-api==0.46
 
 EXPOSE ${NOTEBOOK_PORT}
 
